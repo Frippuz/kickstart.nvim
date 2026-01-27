@@ -332,6 +332,13 @@ require('lazy').setup({
           week_header = {
             enable = true,
           },
+          -- footer = { '', 'Your custom quote here!' },
+          footer = function()
+            local fortune = vim.fn.system('fortune')
+            local lines = vim.split(fortune, '\n')
+            table.insert(lines, 1, '') -- Add blank line at top
+            return lines
+          end,
           shortcut = {
             { desc = '󰊳 Update', group = '@property', action = 'Lazy update', key = 'u' },
             {
