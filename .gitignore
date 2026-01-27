@@ -9,3 +9,5 @@ spell/
 # but for kickstart, it makes sense to leave it ignored.
 lazy-lock.json
 header.txt
+
+.DS_Store
