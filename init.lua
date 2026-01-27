@@ -325,14 +325,11 @@ require('lazy').setup({
     'nvimdev/dashboard-nvim',
     event = 'VimEnter',
     config = function()
-      require('dashboard').setup {
-        -- -- config
+      -- Read ASCII art from file or use week header
+      local header_file = vim.fn.expand('~/.config/nvim/header.txt')
+      local dashboard_config = {
         theme = 'hyper',
         config = {
-          week_header = {
-            enable = true,
-          },
-          -- footer = { '', 'Your custom quote here!' },
           footer = function()
             local fortune = vim.fn.system('fortune')
             local lines = vim.split(fortune, '\n')
@@ -364,6 +361,22 @@ require('lazy').setup({
           },
         },
       }
+
+      -- Check if custom header file exists
+      if vim.fn.filereadable(header_file) == 1 then
+        local file = io.open(header_file, 'r')
+        if file then
+          local content = file:read('*all')
+          file:close()
+          dashboard_config.config.header = vim.split(content, '\n')
+        else
+          dashboard_config.config.week_header = { enable = true }
+        end
+      else
+        dashboard_config.config.week_header = { enable = true }
+      end
+
+      require('dashboard').setup(dashboard_config)
     end,
     dependencies = { 'nvim-tree/nvim-web-devicons', 'nvim-telescope/telescope.nvim' },
   },
