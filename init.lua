@@ -708,6 +708,8 @@ require('lazy').setup({
         ruff = {},         -- Python linting & formatting
         marksman = {},     -- Markdown
         texlab = {},       -- LaTeX
+        ['bash-language-server'] = {},
+
         -- gopls = {},
         -- rust_analyzer = {},
         --
