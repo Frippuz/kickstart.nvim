@@ -193,6 +193,28 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 vim.o.termguicolors = true -- True color support
 vim.o.winborder = 'rounded' -- Window border style
 
+-- [[ Filetype detection for extensionless files ]]
+vim.filetype.add({
+  pattern = {
+    ['.*'] = {
+      function(path, buf)
+        -- Check shebang line for filetype
+        local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+        if first_line and first_line:match('^#!') then
+          if first_line:match('bash') then return 'bash'
+          elseif first_line:match('sh') then return 'sh'
+          elseif first_line:match('python') then return 'python'
+          elseif first_line:match('node') then return 'javascript'
+          elseif first_line:match('ruby') then return 'ruby'
+          elseif first_line:match('perl') then return 'perl'
+          end
+        end
+      end,
+      priority = -math.huge, -- lowest priority, only used as fallback
+    },
+  },
+})
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -704,7 +726,8 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
         clangd = {},       -- C/C++
-        pyright = {},      -- Python type checking
+        -- pyright = {},      -- Python type checking
+        ['jedi-language-server'] = {}, -- Python autocompletion
         ruff = {},         -- Python linting & formatting
         marksman = {},     -- Markdown
         texlab = {},       -- LaTeX
@@ -717,7 +740,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        -- ts_ls = {},server 
       }
 
       -- Ensure the servers and tools above are installed
@@ -803,7 +826,9 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         python = { 'isort', 'black' },
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
         -- Conform can also run multiple formatters sequentially
         -- You can use 'stop_after_first' to run the first available formatter from the list
       },

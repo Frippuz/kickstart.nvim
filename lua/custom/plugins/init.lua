@@ -3,6 +3,8 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  { 'github/copilot.vim' },
+
   {
     'CopilotC-Nvim/CopilotChat.nvim',
     dependencies = {
@@ -17,8 +19,7 @@ return {
       width = 0.5, -- 50% of screen width
     },
   },
-
--- Vimtex for LaTeX support
+  -- Vimtex for LaTeX support
   {
     auto_insert_mode = true, -- Enter insert mode when opening
     'lervag/vimtex',
@@ -27,6 +28,17 @@ return {
     init = function()
       -- VimTeX configuration goes here, e.g.
       vim.g.vimtex_view_method = 'zathura'
+    end,
+  },
+
+  {
+    'kylechui/nvim-surround',
+    version = '^3.0.0', -- Use for stability; omit to use `main` branch for the latest features
+    event = 'VeryLazy',
+    config = function()
+      require('nvim-surround').setup {
+        -- Configuration here, or leave empty to use defaults
+      }
     end,
   },
 }
