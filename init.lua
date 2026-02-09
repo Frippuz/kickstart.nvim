@@ -726,9 +726,7 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
         clangd = {},       -- C/C++
-        -- pyright = {},      -- Python type checking
-        ['jedi-language-server'] = {}, -- Python autocompletion
-        ruff = {},         -- Python linting & formatting
+        pyright = {},      -- Python type checking
         marksman = {},     -- Markdown
         texlab = {},       -- LaTeX
         ['bash-language-server'] = {},
