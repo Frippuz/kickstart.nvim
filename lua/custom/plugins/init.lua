@@ -3,7 +3,15 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  {'tpope/vim-fugitive'},
   { 'github/copilot.vim' },
+  {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      ---@module "ibl"
+      ---@type ibl.config
+      opts = {},
+  },
 
   {
     'CopilotC-Nvim/CopilotChat.nvim',

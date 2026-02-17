@@ -86,6 +86,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
+vim.loader.enable()
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
@@ -185,35 +186,40 @@ vim.opt.fillchars = {
 
 vim.o.autoread = true
 vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHoldI' }, {
- pattern = '*',
- command = 'checktime',
+  pattern = '*',
+  command = 'checktime',
 })
-
 
 vim.o.termguicolors = true -- True color support
 vim.o.winborder = 'rounded' -- Window border style
 
 -- [[ Filetype detection for extensionless files ]]
-vim.filetype.add({
+vim.filetype.add {
   pattern = {
     ['.*'] = {
       function(path, buf)
         -- Check shebang line for filetype
         local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
-        if first_line and first_line:match('^#!') then
-          if first_line:match('bash') then return 'bash'
-          elseif first_line:match('sh') then return 'sh'
-          elseif first_line:match('python') then return 'python'
-          elseif first_line:match('node') then return 'javascript'
-          elseif first_line:match('ruby') then return 'ruby'
-          elseif first_line:match('perl') then return 'perl'
+        if first_line and first_line:match '^#!' then
+          if first_line:match 'bash' then
+            return 'bash'
+          elseif first_line:match 'sh' then
+            return 'sh'
+          elseif first_line:match 'python' then
+            return 'python'
+          elseif first_line:match 'node' then
+            return 'javascript'
+          elseif first_line:match 'ruby' then
+            return 'ruby'
+          elseif first_line:match 'perl' then
+            return 'perl'
           end
         end
       end,
       priority = -math.huge, -- lowest priority, only used as fallback
     },
   },
-})
+}
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -275,15 +281,15 @@ vim.keymap.set('v', '<A-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<c
 -- NOTE: added from https://github.com/ThePrimeagen/init.lua
 
 -- Paste over currently selected text without yanking it
-vim.keymap.set("x", "<leader>p", [["_dP]])
+vim.keymap.set('x', '<leader>p', [["_dP]])
 -- Keep cursor centered when scrolling and searching
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', 'n', 'nzzzv')
+vim.keymap.set('n', 'N', 'Nzzzv')
 
 -- Max fold is one level lower
-vim.keymap.set("n", "zM", "zMzr")
+vim.keymap.set('n', 'zM', 'zMzr')
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -333,26 +339,26 @@ require('lazy').setup({
 
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
-  --    {
-  --        'lewis6991/gitsigns.nvim',
-  --        config = function()
-  --            require('gitsigns').setup({
-  --                -- Your gitsigns configuration here
-  --            })
-  --        end,
-  --    }
+  -- {
+  --   'lewis6991/gitsigns.nvim',
+  --   config = function()
+  --     require('gitsigns').setup {
+  --       -- Your gitsigns configuration here
+  --     }
+  --   end,
+  -- },
   --
   {
     'nvimdev/dashboard-nvim',
     event = 'VimEnter',
     config = function()
       -- Read ASCII art from file or use week header
-      local header_file = vim.fn.expand('~/.config/nvim/header.txt')
+      local header_file = vim.fn.expand '~/.config/nvim/header.txt'
       local dashboard_config = {
         theme = 'hyper',
         config = {
           footer = function()
-            local fortune = vim.fn.system('fortune')
+            local fortune = vim.fn.system 'fortune'
             local lines = vim.split(fortune, '\n')
             table.insert(lines, 1, '') -- Add blank line at top
             return lines
@@ -387,7 +393,7 @@ require('lazy').setup({
       if vim.fn.filereadable(header_file) == 1 then
         local file = io.open(header_file, 'r')
         if file then
-          local content = file:read('*all')
+          local content = file:read '*all'
           file:close()
           dashboard_config.config.header = vim.split(content, '\n')
         else
@@ -445,6 +451,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { 's', group = '[S]urround', mode = { 'n', 'v' } },
       },
     },
   },
@@ -725,10 +732,26 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
-        clangd = {},       -- C/C++
-        pyright = {},      -- Python type checking
-        marksman = {},     -- Markdown
-        texlab = {},       -- LaTeX
+        -- basedpyright = {
+        -- settings = {
+        --   basedpyright = {
+        --     analysis = {
+        --       diagnosticSeverityOverrides = {
+        --         reportUnknownVariableType = "none",
+        --         reportUnknownParameterType = "none",
+        --         reportUnknownArgumentType = "none",
+        --         reportUnknownMemberType = "none",
+        --         reportUnknownLambdaType = "none",
+        --         reportPossiblyUnbound = "none",
+        --       },
+        --     },
+        --   },
+        -- },
+        -- },      -- Python type checking
+        pyright = {}, -- Python LSP server
+        clangd = {}, -- C/C++
+        marksman = {}, -- Markdown
+        texlab = {}, -- LaTeX
         ['bash-language-server'] = {},
 
         -- gopls = {},
@@ -738,7 +761,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},server 
+        -- ts_ls = {},server
       }
 
       -- Ensure the servers and tools above are installed
@@ -824,7 +847,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         python = { 'isort', 'black' },
-        javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
         sh = { 'shfmt' },
         bash = { 'shfmt' },
         -- Conform can also run multiple formatters sequentially
@@ -1009,11 +1032,11 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
