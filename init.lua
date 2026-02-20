@@ -309,6 +309,25 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
+-- Pin main.typ as tinymist main to avoid issues with multi file setups.
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('TinymistAutoPin', { clear = true }),
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+    -- Check if the client exists and is tinymist
+    if client and client.name == 'tinymist' then
+      local bufnr = args.buf
+      local filename = vim.fn.expand('#' .. bufnr .. ':t')
+
+      if filename == 'main.typ' then
+        -- We wrap the command in a clear, parameter-less function
+        vim.schedule(function() pcall(vim.cmd, 'LspTinymistPinMain') end)
+      end
+    end
+  end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -317,6 +336,21 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then error('Error cloning lazy.nvim:\n' .. out) end
 end
+
+-- Pin main.typ as tinymist main to avoid issues with multi file setups.
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    local bufnr = args.buf
+    local filename = vim.fn.expand('#' .. bufnr .. ':t')
+
+    -- Only run if the LSP is tinymist AND the file is main.typ
+    if client and client.name == 'tinymist' and filename == '*/main.typ' then
+      -- Use schedule to ensure the LSP is fully initialized in the engine
+      vim.schedule(function() pcall(vim.cmd, 'LspTinymistPinMain') end)
+    end
+  end,
+})
 
 ---@type vim.Option
 local rtp = vim.opt.rtp
@@ -732,12 +766,12 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
-        pyright = {}, -- Python LSP server
         clangd = {}, -- C/C++
+        pyright = {}, -- Python type checking
         marksman = {}, -- Markdown
         texlab = {}, -- LaTeX
         ['bash-language-server'] = {},
-
+        tinymist = {}, --Typst
         -- gopls = {},
         -- rust_analyzer = {},
         --
@@ -998,7 +1032,7 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     config = function()
       local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(filetypes)
+      require('nvim-treesitter').setup(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
