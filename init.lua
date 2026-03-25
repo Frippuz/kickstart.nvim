@@ -190,7 +190,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
   command = 'checktime',
 })
 
-vim.o.termguicolors = true -- True color support
+vim.o.termguicolors = true  -- True color support
 vim.o.winborder = 'rounded' -- Window border style
 
 -- [[ Filetype detection for extensionless files ]]
@@ -237,7 +237,7 @@ vim.diagnostic.config {
   underline = { severity = vim.diagnostic.severity.ERROR },
 
   -- Can switch between these as you prefer
-  virtual_text = true, -- Text shows up at the end of the line
+  virtual_text = true,   -- Text shows up at the end of the line
   virtual_lines = false, -- Teest shows up underneath the line, with virtual lines
 
   -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
@@ -288,6 +288,21 @@ vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
 
+-- NOTE: More useful binds at https://github.com/adibhanna/nvim/blob/a2c16381/lua/config/keymaps.lua#L4-L48
+
+-- better indenting
+vim.keymap.set("v", "<", "<gv")
+vim.keymap.set("v", ">", ">gv")
+
+-- Move line on the screen rather than by line in the file
+vim.keymap.set("n", "j", "gj", { noremap = true, silent = true })
+vim.keymap.set("n", "k", "gk", { noremap = true, silent = true })
+
+-- Move to start/end of line
+vim.keymap.set({ "n", "x", "o" }, "H", "^", { noremap = true, silent = true })
+vim.keymap.set({ "n", "x", "o" }, "L", "g_", { noremap = true, silent = true })
+
+-- Own stuff 
 -- Max fold is one level lower
 vim.keymap.set('n', 'zM', 'zMzr')
 
@@ -370,7 +385,7 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added via a link or github org/name. To run setup automatically, use `opts = {}`
   { 'NMAC427/guess-indent.nvim', opts = {} },
-
+  { 'nvim-mini/mini.files',      version = false, opts = {} },
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
   -- {
@@ -457,7 +472,6 @@ require('lazy').setup({
       },
     },
   },
-
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -482,10 +496,10 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
+        { '<leader>s', group = '[S]earch',   mode = { 'n', 'v' } },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-        { 's', group = '[S]urround', mode = { 'n', 'v' } },
+        { 's',         group = '[S]urround', mode = { 'n', 'v' } },
       },
     },
   },
@@ -526,7 +540,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -608,7 +622,8 @@ require('lazy').setup({
 
           -- Fuzzy find all the symbols in your current workspace.
           -- Similar to document symbols, except searches over your entire project.
-          vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
+          vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols,
+            { buffer = buf, desc = 'Open Workspace Symbols' })
 
           -- Jump to the type of the word under your cursor.
           -- Useful when you're not sure what type a variable is and you want to see
@@ -641,7 +656,8 @@ require('lazy').setup({
       )
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = '[S]earch [N]eovim files' })
+      vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end,
+        { desc = '[S]earch [N]eovim files' })
     end,
   },
 
@@ -657,7 +673,7 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',    opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
@@ -751,7 +767,9 @@ require('lazy').setup({
           --
           -- This may be unwanted, since they displace some of your code
           if client and client:supports_method('textDocument/inlayHint', event.buf) then
-            map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+            map('<leader>th',
+              function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end,
+              '[T]oggle Inlay [H]ints')
           end
         end,
       })
@@ -766,10 +784,10 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
-        clangd = {}, -- C/C++
-        pyright = {}, -- Python type checking
+        clangd = {},   -- C/C++
+        pyright = {},  -- Python type checking
         marksman = {}, -- Markdown
-        texlab = {}, -- LaTeX
+        texlab = {},   -- LaTeX
         ['bash-language-server'] = {},
         tinymist = {}, --Typst
         -- gopls = {},
@@ -792,7 +810,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'lua-language-server', -- Lua Language server
-        'stylua', -- Used to format Lua code
+        'stylua',              -- Used to format Lua code
         -- You can add other tools here that you want Mason to install
       })
 
@@ -1031,7 +1049,8 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query', 'vim', 'vimdoc' }
+      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query',
+        'vim', 'vimdoc' }
       require('nvim-treesitter').setup(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
