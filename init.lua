@@ -278,17 +278,25 @@ vim.keymap.set('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Up' })
 vim.keymap.set('v', '<A-j>', ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move Down' })
 vim.keymap.set('v', '<A-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = 'Move Up' })
 
--- NOTE: added from https://github.com/ThePrimeagen/init.lua
+-- NOTE: added from https://github.com/ThePrimeagen/init.lua 
+-- More useful binds at https://github.com/adibhanna/nvim/blob/a2c16381/lua/config/keymaps.lua#L4-L48
 
 -- Paste over currently selected text without yanking it
 vim.keymap.set('x', '<leader>p', [["_dP]])
 -- Keep cursor centered when scrolling and searching
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
+
+-- Keep centered when searching
 vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
-
--- NOTE: More useful binds at https://github.com/adibhanna/nvim/blob/a2c16381/lua/config/keymaps.lua#L4-L48
+vim.keymap.set("n", "*", "*zzv", { noremap = true, silent = true })
+vim.keymap.set("n", "#", "#zzv", { noremap = true, silent = true })
+vim.keymap.set("n", "g*", "g*zz", { noremap = true, silent = true })
+vim.keymap.set("n", "g#", "g#zz", { noremap = true, silent = true })
+--
+-- Map enter to ciw in normal mode
+vim.keymap.set("n", "<CR>", "ciw", { noremap = true, silent = true })
 
 -- better indenting
 vim.keymap.set("v", "<", "<gv")
