@@ -3,6 +3,7 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  { 'nvim-mini/mini.files', version = '*' },
   { 'tpope/vim-fugitive' },
   { 'github/copilot.vim' },
   {
