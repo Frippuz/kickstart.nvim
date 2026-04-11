@@ -192,6 +192,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 
 vim.o.termguicolors = true  -- True color support
 vim.o.winborder = 'rounded' -- Window border style
+vim.g.copilot_enabled = false
 
 -- [[ Filetype detection for extensionless files ]]
 vim.filetype.add {
@@ -313,6 +314,10 @@ vim.keymap.set({ "n", "x", "o" }, "L", "g_", { noremap = true, silent = true })
 -- Own stuff 
 -- Max fold is one level lower
 vim.keymap.set('n', 'zM', 'zMzr')
+
+-- Format typst files starting from first header
+vim.keymap.set('n', 'gq', 'gg/=<CR>VGgq')
+
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
