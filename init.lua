@@ -255,6 +255,25 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+-- Alt + hjkl movement between terminal and normal windows
+-- Terminal Mode mappings
+vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]])
+vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]])
+vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]])
+vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]])
+
+-- Insert Mode mappingC
+vim.keymap.set('i', '<C-h>', [[<C-\><C-n><C-w>h]])
+vim.keymap.set('i', '<C-j>', [[<C-\><C-n><C-w>j]])
+vim.keymap.set('i', '<C-k>', [[<C-\><C-n><C-w>k]])
+vim.keymap.set('i', '<C-l>', [[<C-\><C-n><C-w>l]])
+
+-- Normal Mode mappingC
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -265,10 +284,10 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Adde by me from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Move Lines
@@ -316,8 +335,20 @@ vim.keymap.set({ "n", "x", "o" }, "L", "g_", { noremap = true, silent = true })
 vim.keymap.set('n', 'zM', 'zMzr')
 
 -- Format typst files starting from first header
-vim.keymap.set('n', 'gq', 'gg/=<CR>VGgq')
+vim.keymap.set('n', 'gq', function()
+    local view = vim.fn.winsaveview()
+    -- local keys = vim.api.nvim_replace_termcodes("gg/=<CR>VGgq", true, false, true)
+    local keys = vim.api.nvim_replace_termcodes("gg/=<CR>VGgq:noh<CR>", true, false, true)
+    vim.api.nvim_feedkeys(keys, 'nx', false)
+    vim.fn.winrestview(view)
+end, { desc = "Format Typst from first header and return" })
 
+-- vim.keymap.set('n', 'gq', function()
+--   local view = vim.fn.winsaveview()
+--   vim.cmd('silent! /=/,$gq')
+--   vim.cmd('noh')
+--   vim.fn.winrestview(view)
+-- end, { desc = "Format Typst from first header and return" })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -351,6 +382,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
       if filename == 'main.typ' then
         -- We wrap the command in a clear, parameter-less function
         vim.schedule(function() pcall(vim.cmd, 'LspTinymistPinMain') end)
+        vim.schedule(function() pcall(vim.cmd, 'TypstPreview') end)
       end
     end
   end,
@@ -364,21 +396,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then error('Error cloning lazy.nvim:\n' .. out) end
 end
-
--- Pin main.typ as tinymist main to avoid issues with multi file setups.
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    local bufnr = args.buf
-    local filename = vim.fn.expand('#' .. bufnr .. ':t')
-
-    -- Only run if the LSP is tinymist AND the file is main.typ
-    if client and client.name == 'tinymist' and filename == '*/main.typ' then
-      -- Use schedule to ensure the LSP is fully initialized in the engine
-      vim.schedule(function() pcall(vim.cmd, 'LspTinymistPinMain') end)
-    end
-  end,
-})
 
 ---@type vim.Option
 local rtp = vim.opt.rtp

@@ -3,7 +3,8 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  { 'nvim-mini/mini.files', version = '*' },
+  { 'Vililipo/Vimchant' },
+  -- { 'nvim-mini/mini.files', version = '*' },
   { 'tpope/vim-fugitive' },
   { 'github/copilot.vim' },
   {
@@ -43,6 +44,8 @@ return {
     'chomosuke/typst-preview.nvim',
     lazy = false, -- or ft = 'typst'
     version = '1.*',
-    opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+    opts = {
+    port = 36395,
+    }, -- lazy.nvim will implicitly calls `setup {}`
   },
 }
