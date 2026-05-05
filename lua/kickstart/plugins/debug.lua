@@ -23,14 +23,10 @@ return {
 
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
+    'mfussenegger/nvim-dap-python',
   },
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
-    {
-      '<F5>',
-      function() require('dap').continue() end,
-      desc = 'Debug: Start/Continue',
-    },
     {
       '<F1>',
       function() require('dap').step_into() end,
@@ -47,6 +43,17 @@ return {
       desc = 'Debug: Step Out',
     },
     {
+      '<F5>',
+      function() require('dap').continue() end,
+      desc = 'Debug: Start/Continue',
+    },
+    -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
+    {
+      '<F7>',
+      function() require('dapui').toggle() end,
+      desc = 'Debug: See last session result.',
+    },
+    {
       '<leader>b',
       function() require('dap').toggle_breakpoint() end,
       desc = 'Debug: Toggle Breakpoint',
@@ -56,12 +63,7 @@ return {
       function() require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ') end,
       desc = 'Debug: Set Breakpoint',
     },
-    -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-    {
-      '<F7>',
-      function() require('dapui').toggle() end,
-      desc = 'Debug: See last session result.',
-    },
+    { '<leader>ds', function() require('dapui').float_element('scopes', { width = vim.o.columns, height = vim.o.lines, enter = true }) end, desc = 'Debug: Float Scopes' },
   },
   config = function()
     local dap = require 'dap'
@@ -81,6 +83,7 @@ return {
       ensure_installed = {
         -- Update this to ensure that you have the debuggers for the langs you want
         'delve',
+        'debugpy',
       },
     }
 
@@ -107,16 +110,16 @@ return {
     }
 
     -- Change breakpoint icons
-    -- vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
-    -- vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
-    -- local breakpoint_icons = vim.g.have_nerd_font
-    --     and { Breakpoint = '', BreakpointCondition = '', BreakpointRejected = '', LogPoint = '', Stopped = '' }
-    --   or { Breakpoint = '●', BreakpointCondition = '⊜', BreakpointRejected = '⊘', LogPoint = '◆', Stopped = '⭔' }
-    -- for type, icon in pairs(breakpoint_icons) do
-    --   local tp = 'Dap' .. type
-    --   local hl = (type == 'Stopped') and 'DapStop' or 'DapBreak'
-    --   vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
-    -- end
+    vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
+    vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
+    local breakpoint_icons = vim.g.have_nerd_font
+        and { Breakpoint = '', BreakpointCondition = '', BreakpointRejected = '', LogPoint = '', Stopped = '' }
+      or { Breakpoint = '●', BreakpointCondition = '⊜', BreakpointRejected = '⊘', LogPoint = '◆', Stopped = '⭔' }
+    for type, icon in pairs(breakpoint_icons) do
+      local tp = 'Dap' .. type
+      local hl = (type == 'Stopped') and 'DapStop' or 'DapBreak'
+      vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
+    end
 
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
@@ -128,6 +131,30 @@ return {
         -- On Windows delve must be run attached or it crashes.
         -- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
         detached = vim.fn.has 'win32' == 0,
+      },
+    }
+
+    -- Python debugpy config (attach to container)
+    require('dap-python').setup '/opt/venv/bin/python'
+    dap.configurations.python = {
+      {
+        type = 'debugpy',
+        request = 'attach',
+        name = 'Attach to container (debugpy)',
+        connect = { host = '172.17.0.2', port = 5678 },
+        pathMappings = {
+          {
+            localRoot = '/home/tupeli/repos/test_server_generator',
+            remoteRoot = '/home/tupeli/repos/test_server_generator',
+          },
+        },
+      },
+      {
+        type = 'debugpy',
+        request = 'launch',
+        name = 'Launch file',
+        program = '${file}',
+        pythonPath = '/opt/venv/bin/python',
       },
     }
   end,
