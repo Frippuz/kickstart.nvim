@@ -314,13 +314,17 @@ vim.keymap.set("n", "*", "*zzv", { noremap = true, silent = true })
 vim.keymap.set("n", "#", "#zzv", { noremap = true, silent = true })
 vim.keymap.set("n", "g*", "g*zz", { noremap = true, silent = true })
 vim.keymap.set("n", "g#", "g#zz", { noremap = true, silent = true })
---
+
 -- Map enter to ciw in normal mode
 vim.keymap.set("n", "<CR>", "ciw", { noremap = true, silent = true })
 
 -- better indenting
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
+
+-- better increment
+vim.keymap.set("v","<C-a>","<C-a>gv")
+vim.keymap.set("v","<C-x>","<C-x>gv")
 
 -- Move line on the screen rather than by line in the file
 vim.keymap.set("n", "j", "gj", { noremap = true, silent = true })
