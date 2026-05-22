@@ -340,11 +340,14 @@ vim.keymap.set("v","<C-a>","<C-a>gv")
 vim.keymap.set("v","<C-x>","<C-x>gv")
 
 -- Close buffer
-vim.keymap.set('n', '<C-b>d',':bd<CR>')
+vim.keymap.set('n', '<C-b>d',':bd<CR>', {desc= 'Close buffer'})
+vim.keymap.set('n', '<C-b>n',':bn<CR>', {desc= 'Next buffer'})
+vim.keymap.set('n', '<C-b>p',':bp<CR>', {desc= 'Previous buffer'})
 
 -- Open terminal
-vim.keymap.set('n', '<C-t>s', '<C-w>s:ter<CR>')
-vim.keymap.set('n', '<C-t>v', '<C-w>v:ter<CR>')
+vim.keymap.set('n', '<C-t>t', ':ter<CR>', {desc = 'Open terminal'})
+vim.keymap.set('n', '<C-t>s', '<C-w>s:ter<CR>', {desc = 'Split terminal'})
+vim.keymap.set('n', '<C-t>v', '<C-w>v:ter<CR>', {desc = 'Split vertical terminal'})
 
 -- Format typst files starting from first header
 vim.keymap.set('n', 'gq', function()
