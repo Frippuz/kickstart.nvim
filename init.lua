@@ -192,7 +192,6 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
 
 vim.o.termguicolors = true  -- True color support
 vim.o.winborder = 'rounded' -- Window border style
-vim.g.copilot_enabled = false
 
 -- [[ Filetype detection for extensionless files ]]
 vim.filetype.add {
@@ -221,6 +220,19 @@ vim.filetype.add {
     },
   },
 }
+
+-- abbreviations
+vim.cmd('iab teh the')
+vim.cmd('ab repos /home/tupeli/repos')
+vim.cmd('ab home /home/tupeli')
+vim.cmd('ab tsg test_server_generator')
+
+-- Finnish keyboard: ö/ä act as [ ] in Normal/Visual (not Insert).
+-- langmap translates for showcmd but does not trigger chord mappings (öd → [d).
+for _, mode in ipairs({ 'n', 'v', 'x', 'o' }) do
+  vim.keymap.set(mode, 'ö', '[', { remap = true })
+  vim.keymap.set(mode, 'ä', ']', { remap = true })
+end
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -257,22 +269,22 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 
 -- Alt + hjkl movement between terminal and normal windows
 -- Terminal Mode mappings
-vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]])
-vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]])
-vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]])
-vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]])
+vim.keymap.set('t', '<A-h>', [[<C-\><C-n><C-w>h]])
+vim.keymap.set('t', '<A-j>', [[<C-\><C-n><C-w>j]])
+vim.keymap.set('t', '<A-k>', [[<C-\><C-n><C-w>k]])
+vim.keymap.set('t', '<A-l>', [[<C-\><C-n><C-w>l]])
 
--- Insert Mode mappingC
-vim.keymap.set('i', '<C-h>', [[<C-\><C-n><C-w>h]])
-vim.keymap.set('i', '<C-j>', [[<C-\><C-n><C-w>j]])
-vim.keymap.set('i', '<C-k>', [[<C-\><C-n><C-w>k]])
-vim.keymap.set('i', '<C-l>', [[<C-\><C-n><C-w>l]])
+-- Insert Mode mappingA
+vim.keymap.set('i', '<A-h>', [[<C-\><C-n><C-w>h]])
+vim.keymap.set('i', '<A-j>', [[<C-\><C-n><C-w>j]])
+vim.keymap.set('i', '<A-k>', [[<C-\><C-n><C-w>k]])
+vim.keymap.set('i', '<A-l>', [[<C-\><C-n><C-w>l]])
 
--- Normal Mode mappingC
-vim.keymap.set('n', '<C-h>', '<C-w>h')
-vim.keymap.set('n', '<C-j>', '<C-w>j')
-vim.keymap.set('n', '<C-k>', '<C-w>k')
-vim.keymap.set('n', '<C-l>', '<C-w>l')
+-- Normal Mode mappingA
+vim.keymap.set('n', '<A-h>', '<C-w>h')
+vim.keymap.set('n', '<A-j>', '<C-w>j')
+vim.keymap.set('n', '<A-k>', '<C-w>k')
+vim.keymap.set('n', '<A-l>', '<C-w>l')
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -291,18 +303,23 @@ vim.keymap.set('n', '<C-l>', '<C-w>l')
 
 -- Adde by me from https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Move Lines
-vim.keymap.set('n', '<A-j>', "<cmd>execute 'move .+' . v:count1<cr>==", { desc = 'Move Down' })
-vim.keymap.set('n', '<A-k>', "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = 'Move Up' })
-vim.keymap.set('i', '<A-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move Down' })
-vim.keymap.set('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Up' })
-vim.keymap.set('v', '<A-j>', ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move Down' })
-vim.keymap.set('v', '<A-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = 'Move Up' })
-
+-- vim.keymap.set('n', '<A-j>', "<cmd>execute 'move .+' . v:count1<cr>==", { desc = 'Move Down' })
+-- vim.keymap.set('n', '<A-k>', "<cmd>execute 'move .-' . (v:count1 + 1)<cr>==", { desc = 'Move Up' })
+-- vim.keymap.set('i', '<A-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move Down' })
+-- vim.keymap.set('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move Up' })
+-- vim.keymap.set('v', '<A-j>', ":<C-u>execute \"'<,'>move '>+\" . v:count1<cr>gv=gv", { desc = 'Move Down' })
+-- vim.keymap.set('v', '<A-k>', ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", { desc = 'Move Up' })
+--
 -- Added from https://github.com/ThePrimeagen/init.lua 
 -- More useful binds at https://github.com/adibhanna/nvim/blob/a2c16381/lua/config/keymaps.lua#L4-L48
 
+
 -- Paste over currently selected text without yanking it
 vim.keymap.set('x', '<leader>p', [["_dP]])
+
+-- Yank the current file path or name to the system clipboard
+vim.keymap.set('n', 'yp', function() vim.fn.setreg('+', vim.fn.expand('%:p')) end, { desc = 'Yank file path' })
+vim.keymap.set('n', 'yn', function() vim.fn.setreg('+', vim.fn.expand('%:t')) end, { desc = 'Yank file name' })
 
 -- Keep cursor centered when scrolling and searching
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
@@ -335,6 +352,8 @@ vim.keymap.set({ "n", "x", "o" }, "L", "g_", { noremap = true, silent = true })
 -- Max fold is one level lower
 vim.keymap.set('n', 'zM', 'zMzr')
 
+vim.keymap.set('n', '<C-t>c', ':tabc<CR>', {desc = 'Tab close'})
+
 -- better increment
 vim.keymap.set("v","<C-a>","<C-a>gv")
 vim.keymap.set("v","<C-x>","<C-x>gv")
@@ -348,6 +367,25 @@ vim.keymap.set('n', '<C-b>p',':bp<CR>', {desc= 'Previous buffer'})
 vim.keymap.set('n', '<C-t>t', ':ter<CR>', {desc = 'Open terminal'})
 vim.keymap.set('n', '<C-t>s', '<C-w>s:ter<CR>', {desc = 'Split terminal'})
 vim.keymap.set('n', '<C-t>v', '<C-w>v:ter<CR>', {desc = 'Split vertical terminal'})
+
+-- Open agent terminal: terminal buffer named "agent" running the `agent` command
+local function next_agent_name()
+  if vim.fn.bufnr('agent') == -1 then return 'agent' end
+  local i = 2
+  while vim.fn.bufnr('agent' .. i) ~= -1 do i = i + 1 end
+  return 'agent' .. i
+end
+
+local function open_agent()
+  vim.cmd('terminal')
+  vim.cmd('file ' .. next_agent_name())
+  vim.api.nvim_chan_send(vim.b.terminal_job_id, 'agent --resume\n')
+  vim.cmd('startinsert')
+end
+
+vim.keymap.set('n', '<C-a>a', open_agent, {desc = 'Open agent terminal'})
+vim.keymap.set('n', '<C-a>s', function() vim.cmd('split') open_agent() end, {desc = 'Split agent terminal'})
+vim.keymap.set('n', '<C-a>v', function() vim.cmd('vsplit') open_agent() end, {desc = 'Split vertical agent terminal'})
 
 -- Format typst files starting from first header
 vim.keymap.set('n', 'gq', function()
@@ -1097,6 +1135,7 @@ require('lazy').setup({
       local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'python', 'query',
         'vim', 'vimdoc' }
       require('nvim-treesitter').setup(filetypes)
+      require('nvim-treesitter').install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
@@ -1116,7 +1155,7 @@ require('lazy').setup({
   require 'kickstart.plugins.debug',
   require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 

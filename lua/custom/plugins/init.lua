@@ -6,7 +6,6 @@ return {
   { 'Vililipo/Vimchant' },
   -- { 'nvim-mini/mini.files', version = '*' },
   { 'tpope/vim-fugitive' },
-  { 'github/copilot.vim' },
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
